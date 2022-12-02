@@ -3,6 +3,7 @@ import { Outlet, Link, useLocation } from 'react-router-dom'
 import { ProLayout } from '@ant-design/pro-layout'
 import { MenuDataItem } from '@ant-design/pro-components'
 import styles from './index.module.less'
+import './index.less'
 
 const Index: React.FC = () => {
   const location = useLocation()

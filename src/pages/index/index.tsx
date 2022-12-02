@@ -1,6 +1,11 @@
 import React from 'react'
+import { Table } from 'antd'
 
 const Index: React.FC = () => {
-  return <>index</>
+  return (
+    <>
+      <Table />
+    </>
+  )
 }
 export default Index

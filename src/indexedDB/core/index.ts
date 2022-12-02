@@ -65,7 +65,7 @@ class IndexedDB {
           for (let i = 0; i < this.dbConfig.tables.length; i++) {
             const tableConfig = this.dbConfig.tables[i]
             if (this.db.objectStoreNames.contains(tableConfig.tableName)) {
-              break
+              continue
             } else {
               let objectStore
               // 创建存储库

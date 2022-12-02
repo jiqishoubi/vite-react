@@ -11,6 +11,8 @@
     "prettier-all": "prettier --write '**/*.{js,jsx,ts,tsx,vue,css,less,scss,md,json}'"
   },
   "dependencies": {
+    "@ant-design/icons": "^4.8.0",
+    "@ant-design/pro-components": "^2.3.39",
     "antd": "^5.0.3",
     "husky": "^8.0.2",
     "less": "^4.1.3",

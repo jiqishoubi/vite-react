@@ -1,11 +1,18 @@
-import './App.css'
-import { useRoutes } from 'react-router-dom'
-import routes from '@/'
+import './App.less'
+import { useRoutes, BrowserRouter } from 'react-router-dom'
+import routes from '@/routes'
+
+function RouterView() {
+  let element = useRoutes(routes)
+  return element
+}
 
 function App() {
-  let element = useRoutes()
-
-  return element
+  return (
+    <BrowserRouter>
+      <RouterView />
+    </BrowserRouter>
+  )
 }
 
 export default App

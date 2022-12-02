@@ -92,7 +92,8 @@ class IndexedDB {
 
   // 增删改查
   getTransaction(tableName) {
-    if (this.transactionCaches[tableName]) {
+    // if (this.transactionCaches[tableName]) { // 当所有请求都已完成并且在控制返回到事件循环之前没有进一步的请求时，索引数据库事务会自动提交。换句话说 - 您可以在先前请求的成功或错误回调中发出新请求，但不能在事件处理程序等其他异步回调中发出新请求。您需要在点击处理程序中启动一个新事务，因为任何先前的事务都将自动提交。
+    if (false) {
       // 本来就有
     } else {
       //IndexdDB都是通过事务操作的，此处开启一个事务，赋予读写的权限

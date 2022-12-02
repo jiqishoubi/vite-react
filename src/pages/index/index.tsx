@@ -12,9 +12,15 @@ const Index: React.FC = () => {
       console.log('🚀 ~ ', record)
     })
   }
+  function handleInfo() {
+    db_business.getById('staff', 1).then((record) => {
+      console.log('🚀 ~ ', record)
+    })
+  }
   return (
     <>
       <Button onClick={handleAdd}>新建一个员工</Button>
+      <Button onClick={handleInfo}>根据id查询</Button>
       <Table />
     </>
   )

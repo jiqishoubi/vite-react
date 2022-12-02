@@ -6,6 +6,12 @@ class IndexedDB {
   version: number = 1
   db: IDBDatabase | undefined
   status: '' | 'pendding' | 'success' | 'error' = ''
+  transactionCaches: {
+    [propName: string]: {
+      transaction: IDBTransaction
+      objectStore: IDBObjectStore
+    }
+  } = {} // 事务缓存
 
   static _instanceCaches = {}
 
@@ -74,6 +80,7 @@ class IndexedDB {
                 autoIncrement: true, // 实现自增
               })
               // 创建索引，在后面查询数据的时候可以根据索引查
+              // todo
               objectStore.createIndex('name', '姓名', { unique: false })
               objectStore.createIndex('age', '年龄', { unique: false })
             }
@@ -84,16 +91,25 @@ class IndexedDB {
   }
 
   // 增删改查
+  getTransaction(tableName) {
+    if (this.transactionCaches[tableName]) {
+      // 本来就有
+    } else {
+      //IndexdDB都是通过事务操作的，此处开启一个事务，赋予读写的权限
+      var transaction = this.db!.transaction([tableName], 'readwrite')
+      const transactionObj = {
+        transaction,
+        objectStore: transaction.objectStore(tableName),
+      }
+      this.transactionCaches[tableName] = transactionObj
+    }
+    return this.transactionCaches[tableName]
+  }
   add(tableName, record) {
     return new Promise((resolve, reject) => {
       if (!this.db) return reject('this.db undefined')
-      //IndexdDB都是通过事务操作的，此处开启一个事务，赋予读写的权限
-      var transaction = this.db.transaction([tableName], 'readwrite')
-      //获取表的实例，得到objectStore 就可以开始操作了
-      var objectStore = transaction.objectStore(tableName)
-      //此处添加一个student对象
-      var request = objectStore.add(record)
-      //每一个操作都会有成功和是失败的回调
+      var objectStore = this.getTransaction(tableName)?.objectStore
+      var request = objectStore!.add(record)
       request.onsuccess = (event: any) => {
         console.log('添加成功', event)
         const id = event.target.result
@@ -107,6 +123,61 @@ class IndexedDB {
         return reject(event)
       }
     })
+  }
+  delete(tableName, id) {
+    return new Promise((resolve, reject) => {
+      if (!this.db) return reject('this.db undefined')
+      var objectStore = this.getTransaction(tableName)?.objectStore
+
+      var request = objectStore!.delete(id)
+      request.onsuccess = (event) => {
+        console.log('删除成功')
+        return resolve(true)
+      }
+      request.onerror = (event) => {
+        console.log('删除失败')
+        return reject(false)
+      }
+    })
+  }
+  update(tableName, { id, ...restRecord }) {
+    return new Promise((resolve, reject) => {
+      if (!this.db) return reject('this.db undefined')
+      var objectStore = this.getTransaction(tableName)?.objectStore
+
+      var request = objectStore!.put(restRecord, id)
+      request.onsuccess = (event) => {
+        console.log('修改成功')
+        return resolve(true)
+      }
+      request.onerror = (event) => {
+        console.log('修改失败')
+        return reject(false)
+      }
+    })
+  }
+  // 查询
+  // 根据主键查询
+  getById(tableName, id) {
+    return new Promise((resolve, reject) => {
+      if (!this.db) return reject('this.db undefined')
+      var objectStore = this.getTransaction(tableName)?.objectStore
+
+      var request = objectStore!.get(id)
+      request.onsuccess = (event: any) => {
+        console.log('查询成功')
+        const record = event.target.result ?? null
+        return record ? resolve(record) : reject(false)
+      }
+      request.onerror = (event) => {
+        console.log('查询失败')
+        return reject(false)
+      }
+    })
+  }
+  // 根据索引查询
+  getByIndex() {
+    // todo
   }
 }
 

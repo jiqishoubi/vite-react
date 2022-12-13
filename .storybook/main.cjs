@@ -1,4 +1,5 @@
 const { mergeConfig } = require('vite')
+const path = require('path')
 
 module.exports = {
   stories: ['../src/**/*.stories.mdx', '../src/**/*.stories.@(js|jsx|ts|tsx)'],
@@ -15,8 +16,12 @@ module.exports = {
     console.log('🚀 ~ config', config)
     // Merge custom configuration into the default config
     return mergeConfig(config, {
-      // Use the same "resolve" configuration as your app
-      resolve: (await import('../vite.config.js')).default.resolve,
+      resolve: {
+        ...config.resolve,
+        alias: {
+          '@': path.resolve(__dirname, '../src'),
+        },
+      },
     })
   },
 }

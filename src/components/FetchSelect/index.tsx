@@ -29,27 +29,27 @@ const Index = (props) => {
     if (getReady && !getReady(formData)) return
 
     setLoading(true)
-    request
-      .http({
-        url: api,
-        data: {
-          ...formData,
-        },
-      })
-      .finally(() => setLoading(false))
-      .then((data) => {
-        console.log('🚀 ~ data', data)
-        let arr = []
-        if (dealResFunc) {
-          arr = dealResFunc(data ?? [])
-        } else {
-          arr = data ?? []
-        }
-        setOptionArr(arr)
-      })
-      .catch(() => {
-        setOptionArr([])
-      })
+    // request
+    //   .http({
+    //     url: api,
+    //     data: {
+    //       ...formData,
+    //     },
+    //   })
+    //   .finally(() => setLoading(false))
+    //   .then((data) => {
+    //     console.log('🚀 ~ data', data)
+    //     let arr = []
+    //     if (dealResFunc) {
+    //       arr = dealResFunc(data ?? [])
+    //     } else {
+    //       arr = data ?? []
+    //     }
+    //     setOptionArr(arr)
+    //   })
+    //   .catch(() => {
+    //     setOptionArr([])
+    //   })
   }
 
   const debounceFn = useCallback(

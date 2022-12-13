@@ -4,6 +4,7 @@ import { IndexedDB, useIndexedDB } from '@/indexedDB/core'
 import db_business_config from '@/indexedDB/db/business'
 import db_echart_config from '@/indexedDB/db/echart'
 import { ValueOf } from '@/utils/utils_types'
+import FetchSelect from '@/components/FetchSelect'
 
 const db_business = new IndexedDB(db_business_config)
 
@@ -23,18 +24,10 @@ const Index: React.FC = () => {
 
   return (
     <>
+      <FetchSelect></FetchSelect>
       <Button onClick={handleAdd}>新建一个员工</Button>
       <Button onClick={handleInfo}>根据id查询</Button>
       <Table />
-
-      <div
-        className="parent"
-        ref={(e) => {
-          parentRef.current = e
-        }}
-      >
-        {/* echart */}
-      </div>
     </>
   )
 }

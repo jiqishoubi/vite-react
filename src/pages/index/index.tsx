@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { Button, Table } from 'antd'
 import { IndexedDB, useIndexedDB } from '@/indexedDB/core'
 import db_business_config from '@/indexedDB/db/business'
@@ -18,11 +18,23 @@ const Index: React.FC = () => {
     //   console.log('🚀 ~ ', record)
     // })
   }
+
+  const parentRef = useRef(null)
+
   return (
     <>
       <Button onClick={handleAdd}>新建一个员工</Button>
       <Button onClick={handleInfo}>根据id查询</Button>
       <Table />
+
+      <div
+        className="parent"
+        ref={(e) => {
+          parentRef.current = e
+        }}
+      >
+        {/* echart */}
+      </div>
     </>
   )
 }

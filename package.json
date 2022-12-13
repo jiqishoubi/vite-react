@@ -8,7 +8,9 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "prepare": "husky install",
-    "prettier-all": "prettier --write '**/*.{js,jsx,ts,tsx,vue,css,less,scss,md,json}'"
+    "prettier-all": "prettier --write '**/*.{js,jsx,ts,tsx,vue,css,less,scss,md,json}'",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "dependencies": {
     "@ant-design/icons": "^4.8.0",
@@ -25,10 +27,19 @@
     "react-router-dom": "^6.4.4"
   },
   "devDependencies": {
+    "@babel/core": "^7.20.5",
+    "@storybook/addon-actions": "^6.5.14",
+    "@storybook/addon-essentials": "^6.5.14",
+    "@storybook/addon-interactions": "^6.5.14",
+    "@storybook/addon-links": "^6.5.14",
+    "@storybook/builder-vite": "^0.2.5",
+    "@storybook/react": "^6.5.14",
+    "@storybook/testing-library": "^0.0.13",
     "@types/node": "^18.11.10",
     "@types/react": "^18.0.24",
     "@types/react-dom": "^18.0.8",
     "@vitejs/plugin-react": "^2.2.0",
+    "babel-loader": "^8.3.0",
     "path": "^0.12.7",
     "typescript": "^4.6.4",
     "vite": "^3.2.3"

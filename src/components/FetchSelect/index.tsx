@@ -1,25 +1,40 @@
 import request from '@/utils/request'
-import { Select } from 'antd'
+import { Select, SelectProps } from 'antd'
 import { debounce } from 'lodash'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 const { Option } = Select
 
-/**
- * @param { object } props
- * @param { string } props.api 请求接口
- * @param { object } props.formData 携带参数
- * @param { string } [props.valueKey='codeParam']
- * @param { string } [props.textKey='codeValue']
- * @param { string } [props.placeholder='请选择']
- * @param { (data:any)=>any[] } props.dealResFunc 处理返回的data 返回数组
- * @param { (formData: object) => boolean } props.getReady 如果它存在，那么只有那当它返回true的时候 才去请求
- */
+export interface IFetchSelectProps extends SelectProps {
+  value?: string | number | (string | number)[]
+  onChange?: (e?: string | number | (string | number)[], selected?: object | object[]) => void
+  api: string
+  formData?: object
+  valueKey?: string
+  textKey?: string
+  dealResFunc?: (data: any) => any[]
+  getReady?: (formData: object) => boolean // 如果getReady存在，那么只有那当它返回true的时候 才去请求
+}
 
-const Index = (props) => {
-  const { value, disabled, api, formData = {}, valueKey = 'codeKey', textKey = 'codeValue', placeholder = '请选择', dealResFunc, getReady, ...restProps } = props
-  const [optionArr, setOptionArr] = useState([])
+/**
+ *
+ */
+const FetchSelect: React.FC<IFetchSelectProps> = (props) => {
+  const { value, api, formData = {}, valueKey = 'codeParam', textKey = 'codeValue', dealResFunc, getReady, ...restProps } = props
+  const [optionArr, setOptionArr] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
+
+  const showValue = useMemo(() => {
+    if (!value) return undefined
+    if (restProps.mode == 'multiple') {
+      const codes = (value as string).split(',')
+      return codes.map((code) => {
+        return optionArr.find((item) => item[valueKey] == code)?.[valueKey] // 这里要用 == 因为code 有可能是number，转成逗号分隔的字符串之后，就变成string了
+      })
+    } else {
+      return value
+    }
+  }, [value, optionArr, restProps.mode])
 
   useEffect(() => {
     debounceFn(getOptions)
@@ -27,29 +42,23 @@ const Index = (props) => {
 
   const getOptions = () => {
     if (getReady && !getReady(formData)) return
-
     setLoading(true)
-    // request
-    //   .http({
-    //     url: api,
-    //     data: {
-    //       ...formData,
-    //     },
-    //   })
-    //   .finally(() => setLoading(false))
-    //   .then((data) => {
-    //     console.log('🚀 ~ data', data)
-    //     let arr = []
-    //     if (dealResFunc) {
-    //       arr = dealResFunc(data ?? [])
-    //     } else {
-    //       arr = data ?? []
-    //     }
-    //     setOptionArr(arr)
-    //   })
-    //   .catch(() => {
-    //     setOptionArr([])
-    //   })
+    request
+      .http({
+        url: api,
+        data: formData,
+      })
+      .finally(() => setLoading(false))
+      .then((data) => {
+        let arr: any[] = []
+        if (dealResFunc) {
+          arr = dealResFunc(data ?? [])
+        } else {
+          arr = data ?? []
+        }
+        setOptionArr(arr)
+      })
+      .catch(() => setOptionArr([]))
   }
 
   const debounceFn = useCallback(
@@ -57,42 +66,36 @@ const Index = (props) => {
     []
   )
 
-  const onSelectChange = (code) => {
+  // 触发onChange
+  const onSelectChange = (e) => {
     if (props.onChange) {
-      const isArray = Array.isArray(code)
-      if (isArray) {
-        let selectedOption = []
-        code.map((r) => {
-          // selectedOption.push(optionArr.find((itm) => itm[valueKey] == r))
+      if (restProps.mode == 'multiple') {
+        // 多选
+        let selectedOptions: any[] = []
+        const codes = e as (number | string)[]
+        codes.map((code) => {
+          const selectedOption = optionArr.find((item) => item[valueKey] == code)
+          if (selectedOption) selectedOptions.push(selectedOption)
         })
-        props.onChange(code, selectedOption || undefined)
+        const codeStr = codes.join(',')
+        props.onChange(codeStr, selectedOptions) // 逗号分隔的code
       } else {
-        const selectedOption = optionArr.find((itm) => itm[valueKey] == code)
-        props.onChange(code, selectedOption || undefined)
+        // 单选
+        const code = e
+        const selectedOption = optionArr.find((item) => item[valueKey] == code)
+        props.onChange(code, selectedOption)
       }
     }
   }
 
   return (
-    <Select
-      placeholder={placeholder}
-      style={{
-        width: '100%',
-        ...(props.style ?? {}),
-      }}
-      loading={loading}
-      allowClear
-      disabled={disabled}
-      {...restProps}
-      value={value}
-      onChange={onSelectChange}
-    >
+    <Select placeholder="请选择" {...restProps} allowClear loading={loading} value={showValue} onChange={onSelectChange} style={{ width: '100%', ...restProps.style }}>
       {optionArr &&
         Array.isArray(optionArr) &&
-        optionArr.map((obj, index) => {
+        optionArr.map((item, index) => {
           return (
-            <Option key={obj['templateData'] || index} value={obj[valueKey]}>
-              {obj[textKey]}
+            <Option key={item[valueKey] || index} value={item[valueKey]}>
+              {item[textKey]}
             </Option>
           )
         })}
@@ -100,4 +103,4 @@ const Index = (props) => {
   )
 }
 
-export default Index
+export default FetchSelect
